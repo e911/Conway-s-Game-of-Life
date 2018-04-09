@@ -22,31 +22,31 @@ def get_cell_neighbours(cell):
 				neighbours.add([x,y])
 	return clean_boundary(neighbours)
 
-def get_number_of_alive_neighbours_of_a_poit(CURRENT_GENERATION, cell):
+def get_number_of_alive_neighbours_of_a_poit(cell):
 	neighbours = get_cell_neighbours(cell)
 	return len(CURRENT_GENERATION.intersection(neighbours))
 
 def rule_one(cell):
 	"""Any live cell with fewer than two live neighbours dies, as if caused by underpopulation"""
-	if neighbours<2:
+	if cell in CURRENT_GENERATION and get_number_of_alive_neighbours_of_a_poit(cell)<2:
 		return DEAD
-
 	return ALIVE
+	
 def rule_two(cell):
 	"""Any live cell with two or three live neighbours lives on to the next generation."""
-	if neighbours in (2,3):
+	if cell in CURRENT_GENERATION and get_number_of_alive_neighbours_of_a_poit(cell) in (2,3):
 		return ALIVE
 	return DEAD
 
 def rule_three(cell):
 	"""Any live cell with more than three live neighbours dies, as if by overpopulation."""
-	if neighbours>3:
+	if cell in CURRENT_GENERATION and get_number_of_alive_neighbours_of_a_poit(cell)>3:
 		return ALIVE
 	return DEAD
 
 def rule_four(cell):
 	"""Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction."""
-	if neighbours(cell)==3:
+	if cell in CURRENT_GENERATION and get_number_of_alive_neighbours_of_a_poit(cell)==3:
 		return ALIVE
 	return DEAD
 
