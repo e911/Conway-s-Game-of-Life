@@ -1,13 +1,9 @@
-from copy import copy
-from datetime import datetime
+import pygame
 
 ALIVE = True
 DEAD = False
-
-CURRENT_GEN = {(22, 5), (23, 5), (24, 5), (24, 6), (23, 7)}
-OLD_GEN = {}
-X_BOUNDARY = 1080
-Y_BOUNDARY = 1080
+X_BOUNDARY = 500
+Y_BOUNDARY = 500
 
 
 def clean_boundary(neighbours):
@@ -31,67 +27,34 @@ def get_cell_neighbours(cell):
     return clean_boundary(neighbours)
 
 
-def get_number_of_alive_neighbours_of_a_point(cell):
+def get_number_of_alive_neighbours_of_a_point(cell, CURRENT_GEN):
     neighbours = get_cell_neighbours(cell)
     return len(CURRENT_GEN.intersection(neighbours))
 
 
-def rule_one(cell):
+def rule_one(cell, CURRENT_GEN):
     """Any live cell with fewer than two live neighbours dies, as if caused by underpopulation"""
-    if cell in CURRENT_GEN and get_number_of_alive_neighbours_of_a_point(cell) < 2:
+    if cell in CURRENT_GEN and get_number_of_alive_neighbours_of_a_point(cell, CURRENT_GEN) < 2:
         return DEAD
     return ALIVE
 
 
-def rule_two(cell):
+def rule_two(cell, CURRENT_GEN):
     """Any live cell with two or three live neighbours lives on to the next generation."""
-    if cell in CURRENT_GEN and get_number_of_alive_neighbours_of_a_point(cell) in (2, 3):
+    if cell in CURRENT_GEN and get_number_of_alive_neighbours_of_a_point(cell, CURRENT_GEN) in (2, 3):
         return ALIVE
     return DEAD
 
 
-def rule_three(cell):
+def rule_three(cell, CURRENT_GEN):
     """Any live cell with more than three live neighbours dies, as if by overpopulation."""
-    if cell in CURRENT_GEN and get_number_of_alive_neighbours_of_a_point(cell) > 3:
+    if cell in CURRENT_GEN and get_number_of_alive_neighbours_of_a_point(cell, CURRENT_GEN) > 3:
         return DEAD
     return ALIVE
 
 
-def rule_four(cell):
+def rule_four(cell, CURRENT_GEN):
     """Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction."""
-    if cell not in CURRENT_GEN and get_number_of_alive_neighbours_of_a_point(cell) == 3:
+    if cell not in CURRENT_GEN and get_number_of_alive_neighbours_of_a_point(cell, CURRENT_GEN) == 3:
         return ALIVE
     return DEAD
-
-
-def game_of_life():
-    global CURRENT_GEN
-    global OLD_GEN
-    NEW_GEN = set()
-    count = 0
-    OLD_GEN = copy(CURRENT_GEN)
-    first_pass=True
-    start_time = datetime.now()
-    while CURRENT_GEN != OLD_GEN or first_pass:
-        NEW_GEN = set()
-        first_pass=False
-        for cell in CURRENT_GEN:
-            neighbours = get_cell_neighbours(cell).difference(CURRENT_GEN)
-            for neighbour in neighbours:
-                if rule_four(neighbour):
-                    NEW_GEN.add(neighbour)
-            if rule_one(cell) and rule_two(cell) and rule_three(cell):
-                NEW_GEN.add(cell)
-        CURRENT_GEN = copy(NEW_GEN)
-        print(CURRENT_GEN)
-        CURRENT_GEN = clean_boundary(CURRENT_GEN)
-        count +=1
-    if CURRENT_GEN == OLD_GEN:
-        finish_time = datetime.now()
-        print("Total number of iterations :", count)
-        print("Total time taken:" , finish_time-start_time)
-        print("Game of life complete!!")
-
-
-if __name__ == "__main__":
-    game_of_life()
